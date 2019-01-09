@@ -3,6 +3,9 @@ package com.epages.restdocs;
 import static com.epages.restdocs.WireMockDocumentation.idFieldReplacedWithPathParameterValue;
 import static com.epages.restdocs.WireMockDocumentation.templatedResponseField;
 import static com.epages.restdocs.WireMockDocumentation.wiremockJson;
+import static com.epages.restdocs.WireMockDocumentation.absentHeaders;
+import static com.epages.restdocs.WireMockDocumentation.headerDescriptor;
+
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.singletonList;
@@ -16,6 +19,8 @@ import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -199,13 +204,45 @@ public class WireMockJsonSnippetTest {
 				sameJSONAs(new ObjectMapper().writeValueAsString(
 						of( //
 								"request", //
-								of("method", "GET", "urlPath", "/foo", 
+								of("method", "GET", "urlPath", "/foo",
 								"headers", of("Accept", of("contains", "json"))), //
 								"response", //
 								of("headers", emptyMap(), "body", "", "status", 200))
 						)));
 		wiremockJson().document(operationBuilder("custom-mediatype").request("http://localhost/foo").method("GET")
 				.header("Accept", "application/com.carlosjgp.myservice+json; version=1.0").build());
+	}
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void includeAllHeadersExceptHost() throws IOException {
+        this.expectedSnippet.expectWireMockJson("include-headers").withContents((Matcher<String>)
+                sameJSONAs(new ObjectMapper().writeValueAsString(
+                        of( //
+                                "request", //
+                                of("method", "GET", "urlPath", "/foo",
+                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"))), //
+                                "response", //
+                                of("headers", emptyMap(), "body", "", "status", 200))
+                )));
+        wiremockJson().document(operationBuilder("include-headers").request("http://localhost/foo").method("GET")
+                .header("Accept", "application/json").header("X-App-SessionToken", "16").build());
+    }
+
+    @Test
+	@SuppressWarnings("unchecked")
+	public void absentHeadersTest() throws IOException {
+		this.expectedSnippet.expectWireMockJson("exclude-headers").withContents((Matcher<String>)
+				sameJSONAs(new ObjectMapper().writeValueAsString(
+						of( //
+								"request", //
+								of("method", "GET", "urlPath", "/foo",
+										"headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("absent", true))), //
+								"response", //
+								of("headers", emptyMap(), "body", "", "status", 200))
+				)));
+		wiremockJson(absentHeaders(headerDescriptor("X-App-SessionToken"))).document(operationBuilder("exclude-headers").request("http://localhost/foo").method("GET")
+				.header("Accept", "application/json").build());
 	}
 
 	public OperationBuilder operationBuilder(String name) {
