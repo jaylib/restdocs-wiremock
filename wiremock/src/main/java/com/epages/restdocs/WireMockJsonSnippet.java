@@ -42,15 +42,15 @@ final class WireMockJsonSnippet implements Snippet {
 	};
 
 	private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
-    private List<String> includedHeaders;
+    private List<String> includeHeaders;
 
-	WireMockJsonSnippet(ResponseFieldTemplateDescriptor[] responseFieldTemplateDescriptors) {
+
+	WireMockJsonSnippet(ResponseFieldTemplateDescriptor... responseFieldTemplateDescriptors) {
 		this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
 	}
 
-	public WireMockJsonSnippet includeHeaders(List<String> headers) {
-	    this.includedHeaders = headers;
-	    return this;
+    WireMockJsonSnippet(List<String> includeHeaders) {
+        this.includeHeaders = includeHeaders;
     }
 
 	@Override
@@ -178,7 +178,7 @@ final class WireMockJsonSnippet implements Snippet {
 					requestHeaders.put(e.getKey(), Maps.of("contains", mediaType));
 				}
 			} else {
-			    if (this.includedHeaders.contains(e.getKey())) {
+			    if (this.includeHeaders.contains(e.getKey())) {
                     if (!values.isEmpty()) {
                         requestHeaders.put(e.getKey(), Maps.of("contains", values.get(0)));
                     }

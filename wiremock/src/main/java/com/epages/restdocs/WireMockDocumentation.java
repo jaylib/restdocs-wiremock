@@ -21,6 +21,17 @@ public abstract class WireMockDocumentation {
 		return new WireMockJsonSnippet(responseFieldTemplateDescriptors);
 	}
 
+    /**
+     * Returns a json {@code Snippet} that will generate the WireMock stub from
+     * the API operation.
+     *
+     * @return the json snippet
+     * @see {@see MockMvcRestDocumentation}
+     */
+    public static Snippet wiremockJson(List<String> includeHeaders) {
+        return new WireMockJsonSnippet(includeHeaders);
+    }
+
 	/**
 	 * Convenience factory method for the common use case of replacing the id with the path parameter
 	 * Assumes that the id field can be found at the field <code>id</code> and the path contains the id at the second position
