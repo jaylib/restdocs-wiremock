@@ -16,6 +16,7 @@ import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -199,7 +200,7 @@ public class WireMockJsonSnippetTest {
 				sameJSONAs(new ObjectMapper().writeValueAsString(
 						of( //
 								"request", //
-								of("method", "GET", "urlPath", "/foo", 
+								of("method", "GET", "urlPath", "/foo",
 								"headers", of("Accept", of("contains", "json"))), //
 								"response", //
 								of("headers", emptyMap(), "body", "", "status", 200))
@@ -207,6 +208,22 @@ public class WireMockJsonSnippetTest {
 		wiremockJson().document(operationBuilder("custom-mediatype").request("http://localhost/foo").method("GET")
 				.header("Accept", "application/com.carlosjgp.myservice+json; version=1.0").build());
 	}
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void includeHeaders() throws IOException {
+        this.expectedSnippet.expectWireMockJson("include-headers").withContents((Matcher<String>)
+                sameJSONAs(new ObjectMapper().writeValueAsString(
+                        of( //
+                                "request", //
+                                of("method", "GET", "urlPath", "/foo",
+                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"))), //
+                                "response", //
+                                of("headers", emptyMap(), "body", "", "status", 200))
+                )));
+        wiremockJson(Arrays.asList("X-App-SessionToken")).document(operationBuilder("include-headers").request("http://localhost/foo").method("GET")
+                .header("Accept", "application/json").header("X-App-SessionToken", "16").build());
+    }
 
 	public OperationBuilder operationBuilder(String name) {
 		return new OperationBuilder(name, this.expectedSnippet.getOutputDirectory(), FORMAT);
