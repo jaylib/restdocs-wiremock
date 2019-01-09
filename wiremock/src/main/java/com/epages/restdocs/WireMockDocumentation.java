@@ -28,8 +28,8 @@ public abstract class WireMockDocumentation {
      * @return the json snippet
      * @see {@see MockMvcRestDocumentation}
      */
-    public static Snippet wiremockJson(List<String> includeHeaders) {
-        return new WireMockJsonSnippet(includeHeaders);
+    public static Snippet wiremockJson(List<String> includeHeaders, List<String> excludeHeaders) {
+        return new WireMockJsonSnippet(includeHeaders, excludeHeaders);
     }
 
 	/**

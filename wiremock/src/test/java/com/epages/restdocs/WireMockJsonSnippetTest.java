@@ -16,6 +16,7 @@ import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -221,9 +222,25 @@ public class WireMockJsonSnippetTest {
                                 "response", //
                                 of("headers", emptyMap(), "body", "", "status", 200))
                 )));
-        wiremockJson(Arrays.asList("X-App-SessionToken")).document(operationBuilder("include-headers").request("http://localhost/foo").method("GET")
+        wiremockJson(Arrays.asList("X-App-SessionToken"), new ArrayList<String>()).document(operationBuilder("include-headers").request("http://localhost/foo").method("GET")
                 .header("Accept", "application/json").header("X-App-SessionToken", "16").build());
     }
+
+	@Test
+	@SuppressWarnings("unchecked")
+	public void excludeHeaders() throws IOException {
+		this.expectedSnippet.expectWireMockJson("exclude-headers").withContents((Matcher<String>)
+				sameJSONAs(new ObjectMapper().writeValueAsString(
+						of( //
+								"request", //
+								of("method", "GET", "urlPath", "/foo",
+										"headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("absent", true))), //
+								"response", //
+								of("headers", emptyMap(), "body", "", "status", 200))
+				)));
+		wiremockJson(new ArrayList<String>(), Arrays.asList("X-App-SessionToken")).document(operationBuilder("exclude-headers").request("http://localhost/foo").method("GET")
+				.header("Accept", "application/json").build());
+	}
 
 	public OperationBuilder operationBuilder(String name) {
 		return new OperationBuilder(name, this.expectedSnippet.getOutputDirectory(), FORMAT);

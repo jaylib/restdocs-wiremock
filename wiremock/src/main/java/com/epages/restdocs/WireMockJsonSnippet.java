@@ -43,14 +43,16 @@ final class WireMockJsonSnippet implements Snippet {
 
     private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
     private List<String> includeHeaders;
+    private List<String> excludeHeaders;
 
     WireMockJsonSnippet(ResponseFieldTemplateDescriptor... responseFieldTemplateDescriptors) {
         this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
     }
 
-    WireMockJsonSnippet(List<String> includeHeaders) {
+    WireMockJsonSnippet(List<String> includeHeaders, List<String> excludeHeaders) {
         this.responseFieldTemplateDescriptors = Arrays.asList();
         this.includeHeaders = includeHeaders;
+        this.excludeHeaders = excludeHeaders;
     }
 
     @Override
@@ -184,6 +186,11 @@ final class WireMockJsonSnippet implements Snippet {
                             requestHeaders.put(e.getKey(), Maps.of("contains", values.get(0)));
                         }
                     }
+                }
+            }
+            if (this.excludeHeaders != null) {
+                for (String headerKey : this.excludeHeaders) {
+                    requestHeaders.put(headerKey, Maps.of("absent", true));
                 }
             }
         }
