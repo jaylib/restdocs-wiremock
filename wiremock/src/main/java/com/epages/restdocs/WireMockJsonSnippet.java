@@ -44,7 +44,6 @@ final class WireMockJsonSnippet implements Snippet {
 	private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
     private List<String> includeHeaders;
 
-
 	WireMockJsonSnippet(ResponseFieldTemplateDescriptor... responseFieldTemplateDescriptors) {
 		this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
 	}
