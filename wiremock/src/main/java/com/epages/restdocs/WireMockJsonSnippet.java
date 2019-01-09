@@ -156,8 +156,8 @@ final class WireMockJsonSnippet implements Snippet {
 	private Map<Object, Object> requestHeaders(OperationRequest request) {
 		Maps.Builder<Object, Object> requestHeaders = Maps.builder();
 		for (Map.Entry<String, List<String>> e : request.getHeaders().entrySet()) {
+            List<String> values = e.getValue();
 			if ("content-type".equalsIgnoreCase(e.getKey()) || "accept".equalsIgnoreCase(e.getKey())) {
-				List<String> values = e.getValue();
 				if (!values.isEmpty()) {
 					String mediaType = values.get(0);
 					// TODO : use proper MediaType parsing
@@ -171,6 +171,10 @@ final class WireMockJsonSnippet implements Snippet {
 					}
 					requestHeaders.put(e.getKey(), Maps.of("contains", mediaType));
 				}
+			} else {
+                if (!values.isEmpty()) {
+                    requestHeaders.put(e.getKey(), Maps.of("contains", values.get(0)));
+                }
 			}
 		}
 		return requestHeaders.build();
