@@ -8,6 +8,7 @@ buildscript {
 }
 
 plugins {
+    id 'maven'
     id 'pl.allegro.tech.build.axion-release' version '1.9.1'
     id 'com.github.ben-manes.versions' version '0.20.0'
     id 'publishing'
@@ -29,7 +30,7 @@ scmVersion {
 }
 
 allprojects {
-    project.version = scmVersion.version
+    project.version = "0.7.29"
 }
 
 publish.dependsOn(':restdocs-wiremock:bintrayUpload')
