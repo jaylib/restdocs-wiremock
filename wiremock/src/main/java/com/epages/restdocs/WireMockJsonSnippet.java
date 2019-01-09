@@ -42,10 +42,16 @@ final class WireMockJsonSnippet implements Snippet {
 	};
 
 	private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
+    private List<String> includedHeaders;
 
 	WireMockJsonSnippet(ResponseFieldTemplateDescriptor[] responseFieldTemplateDescriptors) {
 		this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
 	}
+
+	public WireMockJsonSnippet includeHeaders(List<String> headers) {
+	    this.includedHeaders = headers;
+	    return this;
+    }
 
 	@Override
 	public void document(Operation operation) throws IOException {
@@ -172,9 +178,12 @@ final class WireMockJsonSnippet implements Snippet {
 					requestHeaders.put(e.getKey(), Maps.of("contains", mediaType));
 				}
 			} else {
-                if (!values.isEmpty()) {
-                    requestHeaders.put(e.getKey(), Maps.of("contains", values.get(0)));
+			    if (this.includedHeaders.contains(e.getKey())) {
+                    if (!values.isEmpty()) {
+                        requestHeaders.put(e.getKey(), Maps.of("contains", values.get(0)));
+                    }
                 }
+
 			}
 		}
 		return requestHeaders.build();

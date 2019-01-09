@@ -1,6 +1,7 @@
 package com.epages.restdocs;
 
 import org.springframework.restdocs.snippet.Snippet;
+import java.util.List;
 
 /**
  * Wrapper around the static API from <code>MockMvcRestDocumentation</code>, to
