@@ -1,15 +1,19 @@
 package com.epages.restdocs;
 
-class AbsentHeaderDescriptor {
+import org.springframework.http.HttpHeaders;
 
-    private String name;
+public class AbsentHeaderDescriptor extends VerifyHeaderDescriptor {
 
-    AbsentHeaderDescriptor(String name) {
-        this.name = name;
-    }
-
-    String getName() {
-        return this.name;
+    /**
+     * Creates a new {@code AbsentHeaderDescriptor} describing the header with the given
+     * {@code name} that should be verified for absense.
+     *
+     * @param name the name
+     * @see HttpHeaders
+     */
+    public AbsentHeaderDescriptor(String name) {
+        super(name);
+        this.absent = true;
     }
 
 }

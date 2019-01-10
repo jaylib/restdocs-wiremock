@@ -2,8 +2,6 @@ package com.epages.restdocs;
 
 import org.springframework.restdocs.snippet.Snippet;
 
-import java.util.List;
-
 /**
  * Wrapper around the static API from <code>MockMvcRestDocumentation</code>, to
  * integrate generation of WireMock stubs. Most of the static API was deprecated
@@ -29,18 +27,7 @@ public abstract class WireMockDocumentation {
      * @return the json snippet
      * @see {@see MockMvcRestDocumentation}
      */
-    public static Snippet wiremockJson(List<String> includeHeaders, List<String> excludeHeaders) {
-        return new WireMockJsonSnippet(includeHeaders, excludeHeaders);
-    }
-
-    /**
-     * Returns a json {@code Snippet} that will generate the WireMock stub from
-     * the API operation.
-     *
-     * @return the json snippet
-     * @see {@see MockMvcRestDocumentation}
-     */
-    public static Snippet wiremockJson(AbsentHeadersSnippet snippet) {
+    public static Snippet wiremockJson(VerifyHeaderSnippets snippet) {
         return new WireMockJsonSnippet(snippet);
     }
 
@@ -56,11 +43,11 @@ public abstract class WireMockDocumentation {
         return new ResponseFieldTemplateDescriptor(path);
     }
 
-    public static AbsentHeaderDescriptor headerDescriptor(String name) {
+    public static AbsentHeaderDescriptor absentHeaderDescriptor(String name) {
         return new AbsentHeaderDescriptor(name);
     }
 
-    public static AbsentHeadersSnippet absentHeaders(AbsentHeaderDescriptor... descriptors) {
-        return new AbsentHeadersSnippet(descriptors);
+    public static VerifyHeaderSnippets verifyHeader(VerifyHeaderDescriptor... descriptors) {
+        return new VerifyHeaderSnippets(descriptors);
     }
 }

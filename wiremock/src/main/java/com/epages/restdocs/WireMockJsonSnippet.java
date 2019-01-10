@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.restdocs.RestDocumentationContext;
 import org.springframework.restdocs.headers.HeaderDescriptor;
-import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.restdocs.operation.*;
 import org.springframework.restdocs.snippet.RestDocumentationContextPlaceholderResolverFactory;
 import org.springframework.restdocs.snippet.Snippet;
@@ -44,25 +43,17 @@ final class WireMockJsonSnippet implements Snippet {
     };
 
     private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
-    private List<String> includeHeaders;
-    private List<String> excludeHeaders;
-    private AbsentHeadersSnippet absentHeaderSnippet;
 
-    WireMockJsonSnippet(AbsentHeadersSnippet snippet) {
+    private VerifyHeaderSnippets verifyHeaderSnippets;
+
+    WireMockJsonSnippet(VerifyHeaderSnippets snippet) {
         this.responseFieldTemplateDescriptors = Arrays.asList();
-        this.absentHeaderSnippet = snippet;
+        this.verifyHeaderSnippets = snippet;
     }
 
     WireMockJsonSnippet(ResponseFieldTemplateDescriptor... responseFieldTemplateDescriptors) {
         this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
     }
-
-    WireMockJsonSnippet(List<String> includeHeaders, List<String> excludeHeaders) {
-        this.responseFieldTemplateDescriptors = Arrays.asList();
-        this.includeHeaders = includeHeaders;
-        this.excludeHeaders = excludeHeaders;
-    }
-
 
     @Override
     public void document(Operation operation) throws IOException {
@@ -196,9 +187,11 @@ final class WireMockJsonSnippet implements Snippet {
                 }
             }
 
-            if (this.absentHeaderSnippet != null) {
-                for (AbsentHeaderDescriptor descriptor : this.absentHeaderSnippet.getHeaderDescriptors()) {
-                    requestHeaders.put(descriptor.getName(), Maps.of("absent", true));
+            if (this.verifyHeaderSnippets != null) {
+                for (VerifyHeaderDescriptor descriptor : this.verifyHeaderSnippets.getHeaderDescriptors()) {
+                    if (descriptor.getAbsent()) {
+                        requestHeaders.put(descriptor.getName(), Maps.of("absent", true));
+                    }
                 }
             }
 
