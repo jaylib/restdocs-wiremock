@@ -131,22 +131,18 @@ final class WireMockJsonSnippet implements Snippet {
         if (operation.getRequest().getMethod() != HttpMethod.POST) {
             return;
         }
-
         String contentString = operation.getRequest().getContentAsString();
         if (contentString.isEmpty()) {
             return;
         }
-
         ArrayList<Map<Object, Object>> bodyPatterns = new ArrayList<>();
-        bodyPatterns.add(Maps.builder().put("equalToJson", contentString
-        ).build());
+        bodyPatterns.add(Maps.builder()
+                .put("equalToJson", contentString)
+                .put("ignoreExtraElements", true)
+                .put("ignoreArrayOrder", true)
+                .build());
 
-        ArrayList<Map<Object, Object>> multipartPatterns = new ArrayList<>();
-
-        multipartPatterns.add(Maps.builder().put("matchingType", "ANY").build());
-        multipartPatterns.add(Maps.builder().put("bodyPatterns", bodyPatterns).build());
-
-        requestBuilder.put("multipartPatterns", multipartPatterns);
+        requestBuilder.put("bodyPatterns", bodyPatterns);
     }
 
     private Map<Object, Object> responseHeaders(OperationResponse response) {

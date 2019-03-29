@@ -244,11 +244,7 @@ public class WireMockJsonSnippetTest {
 
         String requestBody = "{\"email\": \"test@test.de\"}";
         ArrayList<ImmutableMap> bodyPatterns = new ArrayList<>();
-        bodyPatterns.add(of("equalToJson", requestBody));
-
-        ArrayList<ImmutableMap> multipartPatterns = new ArrayList<>();
-        multipartPatterns.add(of("matchingType", "ANY"));
-        multipartPatterns.add(of("bodyPatterns", bodyPatterns));
+        bodyPatterns.add(of("equalToJson", requestBody, "ignoreArrayOrder", true, "ignoreExtraElements", true));
 
 
         this.expectedSnippet.expectWireMockJson("include-request-body-matcher").withContents((Matcher<String>)
@@ -257,7 +253,7 @@ public class WireMockJsonSnippetTest {
                                 "request", //
                                 of("method", "POST", "urlPath", "/foo",
                                         "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"), "Content-Length", of("contains", String.valueOf(requestBody.length()))),
-                                        "multipartPatterns", list(Collections.enumeration(multipartPatterns))
+                                        "bodyPatterns", list(Collections.enumeration(bodyPatterns))
                                         ), //
                                 "response", //
                                 of("headers", emptyMap(), "body", "", "status", 200))
