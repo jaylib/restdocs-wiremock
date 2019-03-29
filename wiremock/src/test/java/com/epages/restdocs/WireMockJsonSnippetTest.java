@@ -3,6 +3,7 @@ package com.epages.restdocs;
 import static com.epages.restdocs.WireMockDocumentation.*;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.list;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,10 +15,7 @@ import static uk.co.datumedge.hamcrest.json.SameJSONAs.sameJSONAs;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.hamcrest.Matcher;
 import org.junit.Rule;
@@ -181,7 +179,7 @@ public class WireMockJsonSnippetTest {
                 sameJSONAs(new ObjectMapper().writeValueAsString(
                         of( //
                                 "request", //
-                                of("method", "POST", "urlPath", "/", "headers", of("Content-Type", of("contains", "uri-list"))), //
+                                of("method", "POST", "urlPath", "/", "headers", of("Content-Type", of("contains", "uri-list"), "Content-Length", of("contains", "15"))), //
                                 "response", //
                                 of("headers", //
                                         of("Content-Length", "16", "Content-Type", "text/plain"),
@@ -238,6 +236,57 @@ public class WireMockJsonSnippetTest {
                 )));
         wiremockJson(verifyHeader(absentHeaderDescriptor("X-App-SessionToken"))).document(operationBuilder("verify-headers").request("http://localhost/foo").method("GET")
                 .header("Accept", "application/json").build());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void includeBodyRequestMatcher() throws IOException {
+
+        String requestBody = "{\"email\": \"test@test.de\"}";
+        ArrayList<ImmutableMap> bodyPatterns = new ArrayList<>();
+        bodyPatterns.add(of("equalToJson", requestBody));
+
+        ArrayList<ImmutableMap> multipartPatterns = new ArrayList<>();
+        multipartPatterns.add(of("matchingType", "ANY"));
+        multipartPatterns.add(of("bodyPatterns", bodyPatterns));
+
+
+        this.expectedSnippet.expectWireMockJson("include-request-body-matcher").withContents((Matcher<String>)
+                sameJSONAs(new ObjectMapper().writeValueAsString(
+                        of( //
+                                "request", //
+                                of("method", "POST", "urlPath", "/foo",
+                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"), "Content-Length", of("contains", String.valueOf(requestBody.length()))),
+                                        "multipartPatterns", list(Collections.enumeration(multipartPatterns))
+                                        ), //
+                                "response", //
+                                of("headers", emptyMap(), "body", "", "status", 200))
+                )));
+        wiremockJson().document(operationBuilder("include-request-body-matcher").request("http://localhost/foo").method("POST")
+                .header("Accept", "application/json")
+                .header("X-App-SessionToken", "16")
+                .content( requestBody)
+                .build());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldNotIncludeRequestBodyMatcher() throws IOException {
+
+        this.expectedSnippet.expectWireMockJson("exclude-request-body-matcher").withContents((Matcher<String>)
+                sameJSONAs(new ObjectMapper().writeValueAsString(
+                        of( //
+                                "request", //
+                                of("method", "POST", "urlPath", "/foo",
+                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"))
+                                ), //
+                                "response", //
+                                of("headers", emptyMap(), "body", "", "status", 200))
+                )));
+        wiremockJson().document(operationBuilder("exclude-request-body-matcher").request("http://localhost/foo").method("POST")
+                .header("Accept", "application/json")
+                .header("X-App-SessionToken", "16")
+                .build());
     }
 
     public OperationBuilder operationBuilder(String name) {

@@ -3,6 +3,7 @@ package com.epages.restdocs;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.http.HttpMethod;
 import org.springframework.restdocs.RestDocumentationContext;
 import org.springframework.restdocs.headers.HeaderDescriptor;
 import org.springframework.restdocs.operation.*;
@@ -15,12 +16,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriTemplate;
 
+
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Collections.singletonList;
 import static org.springframework.restdocs.generate.RestDocumentationGenerator.ATTRIBUTE_NAME_URL_TEMPLATE;
@@ -77,6 +76,7 @@ final class WireMockJsonSnippet implements Snippet {
                 .put("method", operation.getRequest().getMethod());
 
         urlPathOrUrlPattern(operation, requestBuilder);
+        addRequestBodyMatchers(operation, requestBuilder);
 
         Maps.Builder<Object, Object> responseBuilder = Maps.builder()
                 .put("status", response.getStatus().value()).put("headers", responseHeaders(response))
@@ -124,6 +124,29 @@ final class WireMockJsonSnippet implements Snippet {
             String uriPathRegex = uriTemplateBuilder.buildAndExpand(uriVariables.build()).getPath();
             requestBuilder.put("urlPathPattern", uriPathRegex);
         }
+    }
+
+    private void addRequestBodyMatchers(Operation operation, Maps.Builder<Object, Object> requestBuilder) {
+
+        if (operation.getRequest().getMethod() != HttpMethod.POST) {
+            return;
+        }
+
+        String contentString = operation.getRequest().getContentAsString();
+        if (contentString.isEmpty()) {
+            return;
+        }
+
+        ArrayList<Map<Object, Object>> bodyPatterns = new ArrayList<>();
+        bodyPatterns.add(Maps.builder().put("equalToJson", contentString
+        ).build());
+
+        ArrayList<Map<Object, Object>> multipartPatterns = new ArrayList<>();
+
+        multipartPatterns.add(Maps.builder().put("matchingType", "ANY").build());
+        multipartPatterns.add(Maps.builder().put("bodyPatterns", bodyPatterns).build());
+
+        requestBuilder.put("multipartPatterns", multipartPatterns);
     }
 
     private Map<Object, Object> responseHeaders(OperationResponse response) {
