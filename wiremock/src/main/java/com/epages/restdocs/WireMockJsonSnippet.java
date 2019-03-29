@@ -215,6 +215,10 @@ final class WireMockJsonSnippet implements Snippet {
             }
 
         }
+        String contentString = request.getContentAsString();
+        if (contentString.isEmpty() == false) {
+            requestHeaders.remove("Content-Length");
+        }
         return requestHeaders.build();
     }
 
@@ -242,6 +246,11 @@ final class WireMockJsonSnippet implements Snippet {
 
             private Builder<K, V> put(K k, V v) {
                 map.put(k, v);
+                return this;
+            }
+
+            private Builder<K, V> remove(K k) {
+                map.remove(k);
                 return this;
             }
 

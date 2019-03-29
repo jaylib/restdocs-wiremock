@@ -175,19 +175,25 @@ public class WireMockJsonSnippetTest {
     @SuppressWarnings("unchecked")
     @Test
     public void postRequest() throws IOException {
+
+        String requestBody = "response-content";
+        ArrayList<ImmutableMap> bodyPatterns = new ArrayList<>();
+        bodyPatterns.add(of("equalToJson", requestBody, "ignoreArrayOrder", true, "ignoreExtraElements", true));
+
         this.expectedSnippet.expectWireMockJson("post-request").withContents((Matcher<String>)
                 sameJSONAs(new ObjectMapper().writeValueAsString(
                         of( //
                                 "request", //
-                                of("method", "POST", "urlPath", "/", "headers", of("Content-Type", of("contains", "uri-list"), "Content-Length", of("contains", "15"))), //
+                                of("method", "POST", "urlPath", "/", "headers", of("Content-Type", of("contains", "uri-list")),
+                                        "bodyPatterns", list(Collections.enumeration(bodyPatterns))), //
                                 "response", //
                                 of("headers", //
                                         of("Content-Length", "16", "Content-Type", "text/plain"),
-                                        "body", "response-content", "status", 200)))));
+                                        "body", requestBody, "status", 200)))));
         OperationBuilder operationBuilder = operationBuilder("post-request");
-        operationBuilder.response().content("response-content").header("Content-Type", "text/plain").build();
+        operationBuilder.response().content(requestBody).header("Content-Type", "text/plain").build();
         wiremockJson().document(operationBuilder.request("http://localhost/").method("POST")
-                .header("Content-Type", "text/uri-list").content("http://some.uri").build());
+                .header("Content-Type", "text/uri-list").content(requestBody).build());
     }
 
     @Test
@@ -252,7 +258,7 @@ public class WireMockJsonSnippetTest {
                         of( //
                                 "request", //
                                 of("method", "POST", "urlPath", "/foo",
-                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16"), "Content-Length", of("contains", String.valueOf(requestBody.length()))),
+                                        "headers", of("Accept", of("contains", "json"), "X-App-SessionToken", of("contains", "16")),
                                         "bodyPatterns", list(Collections.enumeration(bodyPatterns))
                                         ), //
                                 "response", //
