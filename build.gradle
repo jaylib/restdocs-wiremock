@@ -30,7 +30,7 @@ scmVersion {
 }
 
 allprojects {
-    project.version = "0.7.90"
+    project.version = "0.8.2"
 }
 
 publish.dependsOn(':restdocs-wiremock:bintrayUpload')
