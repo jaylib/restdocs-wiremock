@@ -3,23 +3,24 @@ import org.springframework.restdocs.snippet.AbstractDescriptor;
 
 public class QueryParameterDescriptor extends AbstractDescriptor<QueryParameterDescriptor> {
 
-    protected Boolean ignoreValue;
     protected String name;
+    protected String matchAgainst;
+
 
     /**
      * Creates a new {@code HeaderDescriptor} describing the header with the given
      * {@code name}.
      *
      * @param name the name
-     * @param ignoreValue defines if the value of the query parameter should not be matched
+     * @param matchAgainst defines if the value of the query parameter should not be matched
      */
-    public QueryParameterDescriptor(String name, Boolean ignoreValue) {
+    public QueryParameterDescriptor(String name, String matchAgainst) {
         this.name = name;
-        this.ignoreValue = ignoreValue;
+        this.matchAgainst = matchAgainst;
     }
 
-    public Boolean getIgnoreValue() {
-        return this.ignoreValue;
+    public String getMatchAgainst() {
+        return this.matchAgainst;
     }
 
     public String getName() {

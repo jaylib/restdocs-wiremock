@@ -180,14 +180,14 @@ final class WireMockJsonSnippet implements Snippet {
         for (Map.Entry<String, List<String>> e : queryStringParameters.entrySet()) {
             List<String> values = e.getValue();
             if (!values.isEmpty()) {
-                Boolean ignoreValue = false;
+                String matchAgainst = null;
                 for (QueryParameterDescriptor q: this.queryParameterSnippets.getDescriptors()) {
-                    if (q.getName().equals(e.getKey()) && q.ignoreValue == true) {
-                        ignoreValue = true;
+                    if (q.getName().equals(e.getKey())) {
+                        matchAgainst = q.getMatchAgainst();
                     }
                 }
-                if (ignoreValue) {
-                    queryParams.put(e.getKey(), Maps.of("absent", false));
+                if (matchAgainst != null) {
+                    queryParams.put(e.getKey(), Maps.of("matches", matchAgainst));
                 } else {
                     queryParams.put(e.getKey(), Maps.of("equalTo", values.get(0)));
                 }

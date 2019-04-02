@@ -77,7 +77,7 @@ public abstract class WireMockDocumentation {
         return new QueryParameterSnippets(descriptors);
     }
 
-    public static QueryParameterDescriptor queryParameterDescriptor(String name, Boolean ignoreValue) {
-        return new QueryParameterDescriptor(name, ignoreValue);
+    public static QueryParameterDescriptor queryParameterDescriptor(String name, String matchAgainst) {
+        return new QueryParameterDescriptor(name, matchAgainst);
     }
 }

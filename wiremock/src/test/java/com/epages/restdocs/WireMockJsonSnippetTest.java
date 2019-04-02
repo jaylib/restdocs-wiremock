@@ -175,18 +175,20 @@ public class WireMockJsonSnippetTest {
     @SuppressWarnings("unchecked")
     @Test
     public void getRequestWithParamsAndIgnoredValues() throws IOException {
+        String matchAgainst = "((?:(?:[1]{1}\\\\d{1}\\\\d{1}\\\\d{1})|(?:[2]{1}\\\\d{3}))[-:\\\\/.](?:[0]?[1-9]|[1][012])[-:\\\\/.](?:(?:[0-2]?\\\\d{1})|(?:[3][01]{1})))(?![\\\\d])";
+
         this.expectedSnippet.expectWireMockJson("get-request-ignore").withContents(
                 (Matcher<String>) sameJSONAs(new ObjectMapper().writeValueAsString(
                         of( //
                                 "request", //
                                 of("method", "GET", "urlPath", "/foo", "queryParameters", //
-                                        of("from", of("absent", false), "to", of("absent", false)), "headers", of("Accept", of("contains", "json"))), //
+                                        of("from", of("matches", matchAgainst), "to", of("matches", matchAgainst)), "headers", of("Accept", of("contains", "json"))), //
                                 "response", //
                                 of("headers", emptyMap(), "body", "", "status", 200))
                 )));
         wiremockJson(queryParameterSnippets(
-                queryParameterDescriptor("from", true),
-                queryParameterDescriptor("to", true))).document(operationBuilder("get-request-ignore").request("http://localhost/foo?from=b&to=c").method("GET")
+                queryParameterDescriptor("from", matchAgainst),
+                queryParameterDescriptor("to", matchAgainst))).document(operationBuilder("get-request-ignore").request("http://localhost/foo?from=2018-10-12&to=2018-10-12").method("GET")
                 .header("Accept", "application/json").build());
     }
 
