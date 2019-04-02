@@ -174,6 +174,24 @@ public class WireMockJsonSnippetTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    public void getRequestWithParamsAndIgnoredValues() throws IOException {
+        this.expectedSnippet.expectWireMockJson("get-request-ignore").withContents(
+                (Matcher<String>) sameJSONAs(new ObjectMapper().writeValueAsString(
+                        of( //
+                                "request", //
+                                of("method", "GET", "urlPath", "/foo", "queryParameters", //
+                                        of("from", of("absent", false), "to", of("absent", false)), "headers", of("Accept", of("contains", "json"))), //
+                                "response", //
+                                of("headers", emptyMap(), "body", "", "status", 200))
+                )));
+        wiremockJson(queryParameterSnippets(
+                queryParameterDescriptor("from", true),
+                queryParameterDescriptor("to", true))).document(operationBuilder("get-request-ignore").request("http://localhost/foo?from=b&to=c").method("GET")
+                .header("Accept", "application/json").build());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
     public void postRequest() throws IOException {
 
         String requestBody = "response-content";

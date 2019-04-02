@@ -32,6 +32,28 @@ public abstract class WireMockDocumentation {
     }
 
     /**
+     * Returns a json {@code Snippet} that will generate the WireMock stub from
+     * the API operation.
+     *
+     * @return the json snippet
+     * @see {@see MockMvcRestDocumentation}
+     */
+    public static Snippet wiremockJson(VerifyHeaderSnippets snippet, QueryParameterSnippets snippets) {
+        return new WireMockJsonSnippet(snippet);
+    }
+
+    /**
+     * Returns a json {@code Snippet} that will generate the WireMock stub from
+     * the API operation.
+     *
+     * @return the json snippet
+     * @see {@see MockMvcRestDocumentation}
+     */
+    public static Snippet wiremockJson(QueryParameterSnippets snippets) {
+        return new WireMockJsonSnippet(snippets);
+    }
+
+    /**
      * Convenience factory method for the common use case of replacing the id with the path parameter
      * Assumes that the id field can be found at the field <code>id</code> and the path contains the id at the second position
      */
@@ -49,5 +71,13 @@ public abstract class WireMockDocumentation {
 
     public static VerifyHeaderSnippets verifyHeader(VerifyHeaderDescriptor... descriptors) {
         return new VerifyHeaderSnippets(descriptors);
+    }
+
+    public static QueryParameterSnippets queryParameterSnippets(QueryParameterDescriptor... descriptors) {
+        return new QueryParameterSnippets(descriptors);
+    }
+
+    public static QueryParameterDescriptor queryParameterDescriptor(String name, Boolean ignoreValue) {
+        return new QueryParameterDescriptor(name, ignoreValue);
     }
 }

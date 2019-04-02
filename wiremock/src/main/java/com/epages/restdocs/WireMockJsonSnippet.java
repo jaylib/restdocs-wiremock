@@ -43,15 +43,31 @@ final class WireMockJsonSnippet implements Snippet {
 
     private List<ResponseFieldTemplateDescriptor> responseFieldTemplateDescriptors;
 
+    private QueryParameterSnippets queryParameterSnippets;
+
     private VerifyHeaderSnippets verifyHeaderSnippets;
 
     WireMockJsonSnippet(VerifyHeaderSnippets snippet) {
         this.responseFieldTemplateDescriptors = Arrays.asList();
         this.verifyHeaderSnippets = snippet;
+        this.queryParameterSnippets = new QueryParameterSnippets();
+    }
+
+    WireMockJsonSnippet(QueryParameterSnippets queryParameterSnippets) {
+        this.responseFieldTemplateDescriptors = Arrays.asList();
+        this.queryParameterSnippets = queryParameterSnippets;
+
+    }
+
+    WireMockJsonSnippet(VerifyHeaderSnippets snippets, QueryParameterSnippets queryParameterSnippets) {
+        this.responseFieldTemplateDescriptors = Arrays.asList();
+        this.verifyHeaderSnippets = snippets;
+        this.queryParameterSnippets = queryParameterSnippets;
     }
 
     WireMockJsonSnippet(ResponseFieldTemplateDescriptor... responseFieldTemplateDescriptors) {
         this.responseFieldTemplateDescriptors = Arrays.asList(responseFieldTemplateDescriptors);
+        this.queryParameterSnippets = new QueryParameterSnippets();
     }
 
     @Override
@@ -164,7 +180,17 @@ final class WireMockJsonSnippet implements Snippet {
         for (Map.Entry<String, List<String>> e : queryStringParameters.entrySet()) {
             List<String> values = e.getValue();
             if (!values.isEmpty()) {
-                queryParams.put(e.getKey(), Maps.of("equalTo", values.get(0)));
+                Boolean ignoreValue = false;
+                for (QueryParameterDescriptor q: this.queryParameterSnippets.getDescriptors()) {
+                    if (q.getName().equals(e.getKey()) && q.ignoreValue == true) {
+                        ignoreValue = true;
+                    }
+                }
+                if (ignoreValue) {
+                    queryParams.put(e.getKey(), Maps.of("absent", false));
+                } else {
+                    queryParams.put(e.getKey(), Maps.of("equalTo", values.get(0)));
+                }
             }
         }
 
